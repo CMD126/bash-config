@@ -1,0 +1,70 @@
+# Backup files
+*.bak
+*.backup
+*~
+*.swp
+*.swo
+
+# Temporary files
+*.tmp
+*.temp
+.tmp/
+
+# System files
+.DS_Store
+Thumbs.db
+.directory
+*.log
+
+# IDE/Editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.project
+.classpath
+.c9/
+*.sublime-project
+*.sublime-workspace
+.vim/
+
+# Shell history
+.bash_history
+.zsh_history
+.history
+
+# Environment files
+.env
+.env.local
+.env.*.local
+
+# Build/Output files
+*.o
+*.so
+*.dylib
+build/
+dist/
+*.tar.gz
+*.zip
+
+# Nmap output files (if running locally)
+enum.txt
+enum_*.txt
+*.nmap
+*.gnmap
+*.xml
+
+# Package/Dependency files
+node_modules/
+vendor/
+
+# OS-specific
+.AppleDouble
+.LSOverride
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/

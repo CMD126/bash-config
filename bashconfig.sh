@@ -2,14 +2,14 @@
 set -euo pipefail
 
 echo "Instalando aliases..."
-
-# Remove bloco antigo se existir
+# Remove old aliases if they exist
 if grep -qF "# Bash Aliases" ~/.bashrc 2>/dev/null; then
-    echo "Removendo bloco antigo..."
-    sed -i '/# Bash Aliases/,/====*==*==*==*==*==*==*==*==*==*==*==*/d' ~/.bashrc
+    echo "Removendo blocos antigos..."
+    # Remove from "# ========================================================" to end of enum4 function
+    sed -i '/# ========================================================/,/^}$/d' ~/.bashrc
 fi
 
-# Adiciona aliases
+# add new aliases to .bashrc
 cat >> ~/.bashrc << 'END_ALIASES'
 
 # ========================================================
@@ -42,31 +42,17 @@ alias h='htop'
 alias nf='neofetch'
 alias shot='flameshot gui'
 
-END_ALIASES
-
-# Cria diretório e função
-mkdir -p ~/.bash
-cat > ~/.bash/functions << 'END_FUNC'
-# ========================================================
 # Funções personalizadas
-# ========================================================
-
 enum4() {
     local target="${1:-localhost}"
-    local output="${2:-enum_$(date +%Y%m%d_%H%M).txt}"
+    local output="${2:-scan.txt}"
     echo "Scan $target → $output"
     sudo nmap -sC -sV -p- -oN "$output" "$target"
 }
-END_FUNC
 
-# Source da função (se ainda não existir)
-if ! grep -qF "source ~/.bash/functions" ~/.bashrc 2>/dev/null; then
-    echo "" >> ~/.bashrc
-    echo "# Funções personalizadas" >> ~/.bashrc
-    echo "[[ -f ~/.bash/functions ]] && source ~/.bash/functions" >> ~/.bashrc
-fi
+END_ALIASES
 
 source ~/.bashrc 2>/dev/null || true
 
-echo "Feito."
-echo "Teste: maint ports nf enum4 127.0.0.1"
+echo "Aliases installed successfully!"
+echo "Test: maint ports nf enum4 127.0.0.1"
