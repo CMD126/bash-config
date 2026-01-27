@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-echo "Instalando aliases..."
+echo "Installing aliases..."
 # Remove old aliases if they exist
 if grep -qF "# Bash Aliases" ~/.bashrc 2>/dev/null; then
     echo "Remove old aliases..."
