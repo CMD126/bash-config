@@ -4,7 +4,7 @@ set -euo pipefail
 echo "Instalando aliases..."
 # Remove old aliases if they exist
 if grep -qF "# Bash Aliases" ~/.bashrc 2>/dev/null; then
-    echo "Removendo blocos antigos..."
+    echo "Remove old aliases..."
     # Remove from "# ========================================================" to end of enum4 function
     sed -i '/# ========================================================/,/^}$/d' ~/.bashrc
 fi
@@ -17,14 +17,14 @@ cat >> ~/.bashrc << 'END_ALIASES'
 # lexlucas | https://github.com/CMD126/bash-config
 # ========================================================
 
-# Manutenção
+# system
 alias update='sudo apt update && sudo apt full-upgrade -y'
 alias ifix='sudo apt install -f'
 alias fix='sudo apt --fix-broken install'
 alias clean='sudo apt autoclean && sudo apt autoremove -y && sudo apt clean'
 alias maint='update && clean'
 
-# Rede/Segurança
+# Network Monitoring
 alias ports='ss -tuln | grep LISTEN'
 alias portsfull='sudo ss -tulnp'
 alias conns='ss -tunap | grep ESTAB'
@@ -35,14 +35,14 @@ alias myip='curl -s ifconfig.me'
 alias scan='sudo nmap -sS localhost -T4'
 alias nmap-quick='sudo nmap -F -T4'
 
-# Utilitários
+# Utils and Productivity
 alias cls='clear'
 alias ll='ls -lah --color=auto'
 alias h='htop'
 alias nf='neofetch'
 alias shot='flameshot gui'
 
-# Funções personalizadas
+# Enumeration function
 enum4() {
     local target="${1:-localhost}"
     local output="${2:-scan.txt}"
