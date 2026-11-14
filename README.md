@@ -63,8 +63,8 @@ Performs a full TCP port enumeration scan on the target and saves results to a f
 
 Examples:
 ```bash
-enum4 127.0.0.1             # Scan localhost, save to enum.txt
-enum4 192.168.1.1 scan_.txt # Scan with custom output file
+enum4 127.0.0.1             # Saves to enum4_127.0.0.1_<date>.txt
+enum4 192.168.1.1 scan.txt  # Scan with custom output file
 ```
 
 ## Requirements
@@ -92,24 +92,23 @@ enum4 127.0.0.1
 
 ## Uninstallation
 
-If you want to remove the aliases, edit `~/.bashrc` and delete the section marked with:
 ```bash
-# ========================================================
-# Bash Aliases 
-# lexlucas | https://github.com/CMD126/bash-config
-# ========================================================
-```
-
-Then reload:
-```bash
+./bashconfig.sh --uninstall
 source ~/.bashrc
 ```
+
+The installer only touches the block between these two markers, so the rest of your `~/.bashrc` is never modified:
+```bash
+# >>> bash-config (CMD126) >>>
+# <<< bash-config (CMD126) <<<
+```
+A timestamped backup (`~/.bashrc.bak.<date>`) is created before every install or uninstall.
 
 ## Reinstallation
 
 The script automatically removes old blocks before reinstalling, so you can safely run it multiple times:
 ```bash
-./bashconfig.sh  # Removes old aliases and installs fresh ones
+./bashconfig.sh  # Replaces the existing block (also cleans up blocks from older versions)
 ```
 
 ## Troubleshooting
