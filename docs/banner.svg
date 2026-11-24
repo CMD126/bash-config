@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 300" role="img" aria-labelledby="t">
+  <title id="t">bash-config: aliases for ~/.bashrc</title>
+  <defs>
+    <pattern id="p" width="26" height="26" patternUnits="userSpaceOnUse"><circle cx="2" cy="2" r="1.1" fill="#2A3550" fill-opacity=".7"/></pattern>
+    <radialGradient id="glow" cx="50%" cy="50%" r="50%"><stop offset="0" stop-color="#FFB454" stop-opacity=".55"/><stop offset="1" stop-color="#FFB454" stop-opacity="0"/></radialGradient>
+  </defs>
+  <rect x="1" y="1" width="1198" height="298" rx="22" fill="#0A0E1A" stroke="#2A3550" stroke-width="2"/>
+  <rect x="1" y="1" width="1198" height="298" rx="22" fill="url(#p)"/>
+  <text x="60" y="128" font-family="Inter, 'Segoe UI', system-ui, sans-serif" font-size="66" font-weight="600" letter-spacing="-1"><tspan fill="#E6EAF2">bash-</tspan><tspan fill="#FFB454">config</tspan></text>
+  <text x="62" y="174" font-family="Inter, 'Segoe UI', system-ui, sans-serif" font-size="26" fill="#8FA3C7">Aliases for your ~/.bashrc</text>
+  <rect x="62" y="232" width="57" height="34" rx="17" fill="#121829" stroke="#2A3550"/>
+  <text x="90" y="254" text-anchor="middle" font-family="'JetBrains Mono', Consolas, ui-monospace, monospace" font-size="15" fill="#8FA3C7">Bash</text>
+  <rect x="131" y="232" width="47" height="34" rx="17" fill="#121829" stroke="#2A3550"/>
+  <text x="154" y="254" text-anchor="middle" font-family="'JetBrains Mono', Consolas, ui-monospace, monospace" font-size="15" fill="#8FA3C7">apt</text>
+  <rect x="189" y="232" width="57" height="34" rx="17" fill="#121829" stroke="#2A3550"/>
+  <text x="218" y="254" text-anchor="middle" font-family="'JetBrains Mono', Consolas, ui-monospace, monospace" font-size="15" fill="#8FA3C7">nmap</text>
+  <rect x="600" y="30" width="550" height="240" rx="12" fill="#121829" stroke="#2A3550" stroke-width="2"/>
+  <path d="M600 64 H1150" stroke="#2A3550"/>
+  <circle cx="620" cy="47" r="5" fill="#2A3550"/>
+  <circle cx="638" cy="47" r="5" fill="#2A3550"/>
+  <circle cx="656" cy="47" r="5" fill="#2A3550"/>
+  <text x="875" y="52" text-anchor="middle" font-family="'JetBrains Mono', Consolas, ui-monospace, monospace" font-size="14"  fill="#8FA3C7">~/.bashrc</text>
+  <rect x="612" y="114" width="526" height="122" rx="8" fill="#FFB454" fill-opacity=".10" stroke="#FFB454" stroke-opacity=".6" stroke-dasharray="5 4"/>
+  <text x="626" y="92" text-anchor="start" font-family="'JetBrains Mono', Consolas, ui-monospace, monospace" font-size="15"  fill="#8FA3C7">export PATH=$PATH:~/bin</text>
+  <text x="626" y="136" text-anchor="start" font-family="'JetBrains Mono', Consolas, ui-monospace, monospace" font-size="15"  fill="#FFB454"># &gt;&gt;&gt; bash-config (CMD126) &gt;&gt;&gt;</text>
+  <text x="626" y="160" text-anchor="start" font-family="'JetBrains Mono', Consolas, ui-monospace, monospace" font-size="15"  fill="#E6EAF2">alias update='sudo apt update ...'</text>
+  <text x="626" y="182" text-anchor="start" font-family="'JetBrains Mono', Consolas, ui-monospace, monospace" font-size="15"  fill="#E6EAF2">alias ports='ss -tuln | grep LISTEN'</text>
+  <text x="626" y="204" text-anchor="start" font-family="'JetBrains Mono', Consolas, ui-monospace, monospace" font-size="15"  fill="#E6EAF2">enum4() { sudo nmap -sC -sV -p- ... }</text>
+  <text x="626" y="226" text-anchor="start" font-family="'JetBrains Mono', Consolas, ui-monospace, monospace" font-size="15"  fill="#FFB454"># &lt;&lt;&lt; bash-config (CMD126) &lt;&lt;&lt;</text>
+  <text x="626" y="256" text-anchor="start" font-family="'JetBrains Mono', Consolas, ui-monospace, monospace" font-size="14"  fill="#34D399">$ ./bashconfig.sh --uninstall</text>
+</svg>
