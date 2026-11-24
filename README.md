@@ -1,133 +1,107 @@
-# bashconfig.sh Installation Guide
+<p align="center"><img src="docs/banner.svg" alt="bash-config: aliases for your ~/.bashrc" width="100%"></p>
 
-## Overview
+# bash-config
 
-`bashconfig.sh` is an automated installer that adds useful Bash aliases and functions to your `~/.bashrc` file. It's optimized for Kali Linux, Ubuntu, and Debian-based distributions.
+**One script that adds a block of maintenance, network and scanning aliases (plus an `enum4` function) to your `~/.bashrc`, and removes it again with `--uninstall`.**
 
-## Quick Start
+It targets Kali Linux, Ubuntu and other Debian-based systems that use `apt`.
+
+- [Principles](#principles)
+- [Install and run](#install-and-run)
+- [Using it](#using-it)
+- [What it changes](#what-it-changes)
+- [Limits of this version](#limits-of-this-version)
+- [License](#license)
+
+## Principles
+
+- Everything the installer writes sits between two marker lines. Nothing outside them is touched.
+- A timestamped backup of `~/.bashrc` is made before every install and uninstall.
+- Running it again replaces the block instead of adding a second one.
+- The scanning aliases are for systems you are authorised to test.
+
+## Install and run
+
+Requirements: Bash, `sudo` and `apt`. Optional tools used by some aliases: `nmap`, `htop`, `neofetch`, `flameshot`, `curl`, `ss`.
 
 ```bash
-# Option 1: Direct installation
+sudo apt install nmap htop neofetch flameshot curl net-tools   # optional tools
 chmod +x bashconfig.sh
 ./bashconfig.sh
-
-# Option 2: From any directory
-bash /path/to/bashconfig.sh
-
-# Option 3: One-liner from GitHub
-bash -c "$(curl -fsSL https://raw.githubusercontent.com/CMD126/bash-config/main/bashconfig.sh)"
-```
-
-After installation, reload your shell:
-```bash
 source ~/.bashrc
 ```
 
-## What Gets Installed
+Other ways to start it:
 
-### Aliases
-
-**System Maintenance**
-- `update` - Full apt update + upgrade
-- `ifix` - Install fix for broken packages
-- `fix` - Fix broken/missing packages
-- `clean` - Autoclean + autoremove
-- `maint` - Complete maintenance chain
-
-**Network & Security**
-- `ports` - List listening ports
-- `portsfull` - Show ports with processes
-- `conns` - Show active connections
-- `ufwstat` - UFW firewall status
-- `myip` - Display public IP address
-
-**Pentest & Scanning**
-- `scan` - Quick SYN scan on localhost
-- `nmap-quick` - Fast scan of top ports
-- `enum4` - Full TCP enumeration (function)
-
-**Utilities**
-- `cls` - Clear screen
-- `ll` - Long directory listing
-- `h` - Launch htop
-- `nf` - Show neofetch system info
-- `shot` - Flameshot screenshot tool
-
-### Functions
-
-**enum4()**
 ```bash
-enum4 <target> [output_file]
-```
-Performs a full TCP port enumeration scan on the target and saves results to a file.
-
-Examples:
-```bash
-enum4 127.0.0.1             # Saves to enum4_127.0.0.1_<date>.txt
-enum4 192.168.1.1 scan.txt  # Scan with custom output file
+bash /path/to/bashconfig.sh
+bash -c "$(curl -fsSL https://raw.githubusercontent.com/CMD126/bash-config/main/bashconfig.sh)"
 ```
 
-## Requirements
+Read the script before you pipe anything from the network into a shell.
 
-- Bash shell
-- sudo access
-- apt (Debian/Ubuntu package manager)
-- Optional tools: nmap, htop, neofetch, flameshot, curl, ss
-
-Install optional tools:
-```bash
-sudo apt install nmap htop neofetch flameshot curl net-tools
-```
-
-## Testing Your Installation
-
-Test all features:
-```bash
-# Test aliases
-maint && ports && nf
-
-# Test enum4 function
-enum4 127.0.0.1
-```
-
-## Uninstallation
+To remove it:
 
 ```bash
 ./bashconfig.sh --uninstall
 source ~/.bashrc
 ```
 
-The installer only touches the block between these two markers, so the rest of your `~/.bashrc` is never modified:
+## Using it
+
+System maintenance:
+
+| Alias | Runs |
+| --- | --- |
+| `update` | `sudo apt update && sudo apt full-upgrade -y` |
+| `ifix` | `sudo apt install -f` |
+| `fix` | `sudo apt --fix-broken install` |
+| `clean` | `sudo apt autoclean && sudo apt autoremove -y && sudo apt clean` |
+| `maint` | `update && clean` |
+
+Network:
+
+| Alias | Runs |
+| --- | --- |
+| `ports` | `ss -tuln \| grep LISTEN` |
+| `portsfull` | `sudo ss -tulnp` |
+| `conns` | `ss -tunap \| grep ESTAB` |
+| `ufwstat` | `sudo ufw status verbose` |
+| `myip` | `curl -s ifconfig.me` |
+
+Scanning (only against systems you are authorised to test):
+
+| Alias | Runs |
+| --- | --- |
+| `scan` | `sudo nmap -sS localhost -T4` |
+| `nmap-quick` | `sudo nmap -F -T4` (give it a target) |
+
+Utilities: `cls` (`clear`), `ll` (`ls -lah --color=auto`), `h` (`htop`), `nf` (`neofetch`), `shot` (`flameshot gui`).
+
+The `enum4` function runs a full TCP port scan with default scripts and version detection (`sudo nmap -sC -sV -p-`) and writes the result to a file:
+
 ```bash
-# >>> bash-config (CMD126) >>>
-# <<< bash-config (CMD126) <<<
-```
-A timestamped backup (`~/.bashrc.bak.<date>`) is created before every install or uninstall.
-
-## Reinstallation
-
-The script automatically removes old blocks before reinstalling, so you can safely run it multiple times:
-```bash
-./bashconfig.sh  # Replaces the existing block (also cleans up blocks from older versions)
+enum4 <target> [output_file]
+enum4 127.0.0.1             # target defaults to localhost; file is enum4_127.0.0.1_<date-time>.txt
+enum4 192.168.1.1 scan.txt  # custom output file
 ```
 
-## Troubleshooting
+## What it changes
 
-**Issue: "command not found" for aliases**
-- Run `source ~/.bashrc` to reload the configuration
+- It appends one block to `~/.bashrc` (or to the file named in the `BASHRC` environment variable, which is handy for a dry run on a copy).
+- The block starts with `# >>> bash-config (CMD126) >>>` and ends with `# <<< bash-config (CMD126) <<<`.
+- Before every install or uninstall it copies the file to `~/.bashrc.bak.<YYYYMMDD-HHMMSS>`. Old backups are not deleted, so they pile up.
+- On install it first removes any existing block, including the older format that had no end marker, then writes the new one.
+- It installs nothing else and does not change any other file.
 
-**Issue: sudo password prompts for every alias**
-- This is expected for aliases that require root access
-- Configure sudo for passwordless access if desired
+## Limits of this version
 
-**Issue: Some tools not found**
-- Install optional dependencies: `sudo apt install nmap htop neofetch`
+- `apt` only. Other package managers are not supported.
+- The aliases run `sudo` and some need a password each time.
+- Several aliases shadow common names (`fix`, `clean`, `update`, `h`, `ll`). Check they do not clash with your own.
+- If the start marker is present but the end marker is missing, the removal step treats everything after the start marker as part of the block.
+- There is no automated test suite. The install, reinstall and uninstall cycle was checked by hand against a scratch copy of a bashrc.
 
-## Author
+## License
 
-lexlucas | https://github.com/CMD126/bash-config
-
-## Support
-
-For issues and feature requests, visit:
-https://github.com/CMD126/bash-config
+MIT. See [LICENSE](LICENSE).
