@@ -11,7 +11,29 @@ END_MARK="# <<< bash-config (CMD126) <<<"
 
 touch "$BASHRC"
 
+# Refuse to touch the file unless the markers are consistent: either none at
+# all (nothing to remove, or legacy format), or exactly one start and one end
+# marker with the start first.
+check_markers() {
+    local b e first
+    b="$(grep -Fxc -- "$BEGIN_MARK" "$BASHRC" || true)"
+    e="$(grep -Fxc -- "$END_MARK" "$BASHRC" || true)"
+    if [[ "$b" == 0 && "$e" == 0 ]]; then
+        return 0
+    fi
+    if [[ "$b" != 1 || "$e" != 1 ]]; then
+        echo "Error: expected exactly one start and one end marker in $BASHRC, found $b start and $e end. File left unchanged." >&2
+        return 1
+    fi
+    first="$(grep -Fx -m 1 -e "$BEGIN_MARK" -e "$END_MARK" "$BASHRC")"
+    if [[ "$first" != "$BEGIN_MARK" ]]; then
+        echo "Error: end marker comes before start marker in $BASHRC. File left unchanged." >&2
+        return 1
+    fi
+}
+
 remove_block() {
+    check_markers || return 1
     local tmp
     tmp="$(mktemp)"
     # 1) Current format: delete only what sits between our own markers.
@@ -39,6 +61,9 @@ remove_block() {
     cat "$tmp" > "$BASHRC"
     rm -f "$tmp"
 }
+
+# Validate before making a backup so a refusal leaves everything untouched.
+check_markers || exit 1
 
 backup="$BASHRC.bak.$(date +%Y%m%d-%H%M%S)"
 cp "$BASHRC" "$backup"
