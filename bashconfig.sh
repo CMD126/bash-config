@@ -6,12 +6,35 @@
 set -euo pipefail
 
 BASHRC="${BASHRC:-$HOME/.bashrc}"
+MAX_BACKUPS=3
 BEGIN_MARK="# >>> bash-config (CMD126) >>>"
 END_MARK="# <<< bash-config (CMD126) <<<"
 
 touch "$BASHRC"
 
+# Refuse to touch the file unless the markers are consistent: either none at
+# all (nothing to remove, or legacy format), or exactly one start and one end
+# marker with the start first.
+check_markers() {
+    local b e first
+    b="$(grep -Fxc -- "$BEGIN_MARK" "$BASHRC" || true)"
+    e="$(grep -Fxc -- "$END_MARK" "$BASHRC" || true)"
+    if [[ "$b" == 0 && "$e" == 0 ]]; then
+        return 0
+    fi
+    if [[ "$b" != 1 || "$e" != 1 ]]; then
+        echo "Error: expected exactly one start and one end marker in $BASHRC, found $b start and $e end. File left unchanged." >&2
+        return 1
+    fi
+    first="$(grep -Fx -m 1 -e "$BEGIN_MARK" -e "$END_MARK" "$BASHRC")"
+    if [[ "$first" != "$BEGIN_MARK" ]]; then
+        echo "Error: end marker comes before start marker in $BASHRC. File left unchanged." >&2
+        return 1
+    fi
+}
+
 remove_block() {
+    check_markers || return 1
     local tmp
     tmp="$(mktemp)"
     # 1) Current format: delete only what sits between our own markers.
@@ -40,9 +63,27 @@ remove_block() {
     rm -f "$tmp"
 }
 
+# Keep only the newest MAX_BACKUPS files named "$BASHRC.bak.YYYYMMDD-HHMMSS".
+prune_backups() {
+    local f i count
+    local -a found=()
+    for f in "$BASHRC".bak.[0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9]-[0-9][0-9][0-9][0-9][0-9][0-9]; do
+        if [[ -f "$f" && ! -L "$f" ]]; then found+=("$f"); fi
+    done
+    count=${#found[@]}
+    # The glob expands in sorted order and the timestamp sorts oldest first.
+    for ((i = 0; i < count - MAX_BACKUPS; i++)); do
+        rm -f -- "${found[i]}"
+    done
+}
+
+# Validate before making a backup so a refusal leaves everything untouched.
+check_markers || exit 1
+
 backup="$BASHRC.bak.$(date +%Y%m%d-%H%M%S)"
 cp "$BASHRC" "$backup"
 echo "Backup saved to $backup"
+prune_backups
 
 if [[ "${1:-}" == "--uninstall" ]]; then
     remove_block
