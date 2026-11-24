@@ -6,6 +6,7 @@
 set -euo pipefail
 
 BASHRC="${BASHRC:-$HOME/.bashrc}"
+MAX_BACKUPS=3
 BEGIN_MARK="# >>> bash-config (CMD126) >>>"
 END_MARK="# <<< bash-config (CMD126) <<<"
 
@@ -62,12 +63,27 @@ remove_block() {
     rm -f "$tmp"
 }
 
+# Keep only the newest MAX_BACKUPS files named "$BASHRC.bak.YYYYMMDD-HHMMSS".
+prune_backups() {
+    local f i count
+    local -a found=()
+    for f in "$BASHRC".bak.[0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9]-[0-9][0-9][0-9][0-9][0-9][0-9]; do
+        if [[ -f "$f" && ! -L "$f" ]]; then found+=("$f"); fi
+    done
+    count=${#found[@]}
+    # The glob expands in sorted order and the timestamp sorts oldest first.
+    for ((i = 0; i < count - MAX_BACKUPS; i++)); do
+        rm -f -- "${found[i]}"
+    done
+}
+
 # Validate before making a backup so a refusal leaves everything untouched.
 check_markers || exit 1
 
 backup="$BASHRC.bak.$(date +%Y%m%d-%H%M%S)"
 cp "$BASHRC" "$backup"
 echo "Backup saved to $backup"
+prune_backups
 
 if [[ "${1:-}" == "--uninstall" ]]; then
     remove_block
