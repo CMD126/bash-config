@@ -11,12 +11,14 @@ It targets Kali Linux, Ubuntu and other Debian-based systems that use `apt`.
 - [Using it](#using-it)
 - [What it changes](#what-it-changes)
 - [Limits of this version](#limits-of-this-version)
+- [Tests](#tests)
 - [License](#license)
 
 ## Principles
 
 - Everything the installer writes sits between two marker lines. Nothing outside them is touched.
-- A timestamped backup of `~/.bashrc` is made before every install and uninstall.
+- A timestamped backup of `~/.bashrc` is made before every install and uninstall. Only the 3 newest backups are kept.
+- It refuses to remove a block whose markers are missing, duplicated or out of order, and leaves the file unchanged.
 - Running it again replaces the block instead of adding a second one.
 - The scanning aliases are for systems you are authorised to test.
 
@@ -90,8 +92,9 @@ enum4 192.168.1.1 scan.txt  # custom output file
 
 - It appends one block to `~/.bashrc` (or to the file named in the `BASHRC` environment variable, which is handy for a dry run on a copy).
 - The block starts with `# >>> bash-config (CMD126) >>>` and ends with `# <<< bash-config (CMD126) <<<`.
-- Before every install or uninstall it copies the file to `~/.bashrc.bak.<YYYYMMDD-HHMMSS>`. Old backups are not deleted, so they pile up.
+- Before every install or uninstall it copies the file to `~/.bashrc.bak.<YYYYMMDD-HHMMSS>`. Only the 3 newest such backups are kept (`MAX_BACKUPS` at the top of the script); older ones are deleted. Other files are never touched.
 - On install it first removes any existing block, including the older format that had no end marker, then writes the new one.
+- Removal only happens when the start and end markers each appear exactly once, start first. Otherwise it prints an error to stderr, exits non-zero and changes nothing (no backup either). Fix the markers by hand and run it again.
 - It installs nothing else and does not change any other file.
 
 ## Limits of this version
@@ -99,8 +102,15 @@ enum4 192.168.1.1 scan.txt  # custom output file
 - `apt` only. Other package managers are not supported.
 - The aliases run `sudo` and some need a password each time.
 - Several aliases shadow common names (`fix`, `clean`, `update`, `h`, `ll`). Check they do not clash with your own.
-- If the start marker is present but the end marker is missing, the removal step treats everything after the start marker as part of the block.
-- There is no automated test suite. The install, reinstall and uninstall cycle was checked by hand against a scratch copy of a bashrc.
+- The tests cover the main install, reinstall, uninstall and backup cases only.
+
+## Tests
+
+```bash
+bash tests/test_bashconfig.sh
+```
+
+The tests run against a temporary file through the `BASHRC` variable, so your real `~/.bashrc` is not touched. CI runs the same script plus `shellcheck`.
 
 ## License
 
